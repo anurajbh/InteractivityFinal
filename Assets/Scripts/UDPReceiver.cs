@@ -5,7 +5,9 @@ public class UDPReceiver : MonoBehaviour
 {
     [Header("OSC Settings")]
     public string address = "/facetracker"; // Base OSC address
-    public int port = 7000;                 // Listening port (match Python script)
+    public int port = 7000;                 // Listening port (matches Python script)
+
+    public ShipController shipController;
 
     private OSCReceiver _receiver;
 
@@ -20,35 +22,32 @@ public class UDPReceiver : MonoBehaviour
         // Bind specific addresses to their handlers
         _receiver.Bind("/facetracker/look/up_down", OnReceiveUpDown);
         _receiver.Bind("/facetracker/look/left_right", OnReceiveLeftRight);
-        //_receiver.Bind("/facetracker/look/roll", OnReceiveRoll);
+        _receiver.Bind("/facetracker/look/roll", OnReceiveRoll); // Bind roll
 
-        Debug.Log($"Listening for OSC messages on port {port}");
+        //Debug.Log($"Listening for OSC messages on port {port}");
     }
 
     private void OnReceiveUpDown(OSCMessage message)
     {
-        if (message.ToFloat(out float upDown))
+        float upDown = message.Values[0].FloatValue;
+        if (upDown > 0)
         {
-            Debug.Log($"Received Up/Down: {upDown}");
-            // Use upDown value for actions like head tilt
+            shipController.SetThrust(upDown);
         }
+        //Debug.Log($"Received Up/Down: {upDown}");
     }
 
     private void OnReceiveLeftRight(OSCMessage message)
     {
-        if (message.ToFloat(out float leftRight))
-        {
-            Debug.Log($"Received Left/Right: {leftRight}");
-            // Use leftRight value for actions like head turn
-        }
+        float leftRight = message.Values[0].FloatValue;
+        shipController.SetRotation(leftRight);
+        //Debug.Log($"Received Left/Right: {leftRight}");
     }
 
-    /*private void OnReceiveRoll(OSCMessage message)
+    private void OnReceiveRoll(OSCMessage message)
     {
-        if (message.ToFloat(out float roll))
-        {
-            Debug.Log($"Received Roll: {roll}");
-            // Use roll value for actions like head roll/tilt
-        }
-    }*/
+        float roll = message.Values[0].FloatValue;
+        shipController.SetRoll(roll); // Adjust roll
+        //Debug.Log($"Received Roll: {roll}");
+    }
 }
