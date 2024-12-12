@@ -1,5 +1,6 @@
 using UnityEngine;
 using extOSC;
+using System;
 
 public class UDPReceiver : MonoBehaviour
 {
@@ -30,7 +31,7 @@ public class UDPReceiver : MonoBehaviour
     private void OnReceiveUpDown(OSCMessage message)
     {
         float upDown = message.Values[0].FloatValue;
-        if (upDown > 0)
+        if (upDown > float.Epsilon)
         {
             shipController.SetThrust(upDown);
         }
